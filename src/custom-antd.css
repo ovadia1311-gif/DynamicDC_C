@@ -1,0 +1,17 @@
+﻿/* Customize the scrollbar track */
+::-webkit-scrollbar-track {
+    background-color: red;
+    /* Set the background color of the track */
+}
+
+/* Customize the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+    background-color: orange;
+    /* Set the color of the thumb */
+}
+
+/* Customize the scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+    background-color: orange;
+    /* Set the color of the thumb on hover */
+}

@@ -1,0 +1,99 @@
+﻿npm run build --env=production
+
+
+בדוק מודרך היסטוריה
+
+{
+"type":"getSetData",
+"sequenceFromValue":"60",
+"sequenceToValue":"70",
+"query": {
+"first":"value",
+"second":"[dbo].[tprp]",
+"third":"sequence = '30' and  tab_type ='@tab_type' and  ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and tab_type ='@tab_type' and sequence = '@sequenceFromValue' and value = '@valueFromValue'  order by create_dt desc)"
+}
+}
+
+
+-------------------------------------------------- בדוק היסטוריה
+[{
+"type":"getSetDataTypeDate",
+"sequenceFromValue":"60",
+"sequenceToValue":"70",
+"query": {
+"first":"value",
+"second":"[dbo].[tprp]",
+"third":"sequence = '30' and  tab_type ='@tab_type' and  ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and tab_type ='@tab_type' and sequence = '@sequenceFromValue' and value = '@valueFromValue'  and ticket <> '@ticket' order by create_dt desc)"
+}
+}
+,
+{
+"type":"getSetSumFromListDataByTicket",
+"sequenceFromValue":"60",
+"sequenceToValue":"120",
+"query": {
+"first":"sum(CAST(ehour AS INTEGER)) as value",
+"second":"[dbo].[tevents]",
+"third":" ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and tab_type ='@tab_type' and sequence = '60' and value = '@valueFromValue'  and ticket <> '@ticket' order by create_dt desc)"
+}
+},
+{
+"type":"getSetMultiLastData",
+"sequenceFromValue":"60",
+"fromValueTab_type":"d0193265-e901-492c-84c1-fb2f57ef0306",
+"sequences":"80,90,100,110,120,130,140,150,160,170,180,190",
+"query": {
+"first":"*",
+"second":"[dbo].[tprp]",
+"third":"ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and sequence = '@sequenceFromValue' and value = '@valueFromValue' and ticket <> '@ticket' order by create_dt desc)"
+}},
+{
+"type":"getSetMultiLastDataToHidden",
+"sequenceFromValue":"60",
+"fromValueTab_type":"d0193265-e901-492c-84c1-fb2f57ef0306",
+"sequences": [{"from":"50,52,54,57","to":"45"},{"from":"60,62,67,67","to":"46"}],
+"query": {
+"first":"*",
+"second":"[dbo].[tprp]",
+"third":"ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and sequence = '@sequenceFromValue' and value = '@valueFromValue' and ticket <> '@ticket' order by create_dt desc)"
+}}
+]
+----------------------- Cahnge 11082024 --------------
+[{
+"type":"getSetDataTypeDate",
+"sequenceFromValue":"60",
+"sequenceToValue":"70",
+"query": {
+"first":"value",
+"second":"[dbo].[tprp]",
+"third":"sequence = '30' and  tab_type ='@tab_type' and  ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and tab_type ='@tab_type' and sequence = '@sequenceFromValue' and value = '@valueFromValue'  and ticket <> '@ticket' order by create_dt desc)"
+}
+}
+,
+{
+"type":"getSetDataTypeInt",
+"sequenceFromValue":"120:1,40:3",
+"sequenceToValue":"120:1",
+"key": "60:1"
+},
+{
+"type":"getSetMultiLastData",
+"sequenceFromValue":"60",
+"fromValueTab_type":"d0193265-e901-492c-84c1-fb2f57ef0306",
+"sequences":"80,90,100,110,120,130,140,150,160,170,180,190",
+"query": {
+"first":"*",
+"second":"[dbo].[tprp]",
+"third":"ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and sequence = '@sequenceFromValue' and value = '@valueFromValue' and ticket <> '@ticket' order by create_dt desc)"
+}},
+{
+"type":"getSetMultiLastDataToHidden",
+"sequenceFromValue":"60",
+"fromValueTab_type":"d0193265-e901-492c-84c1-fb2f57ef0306",
+"sequences": [{"from":"50,52,54,57","to":"45"},{"from":"60,62,67,67","to":"46"}],
+"query": {
+"first":"*",
+"second":"[dbo].[tprp]",
+"third":"ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and sequence = '@sequenceFromValue' and value = '@valueFromValue' and ticket <> '@ticket' order by create_dt desc)"
+}}
+]

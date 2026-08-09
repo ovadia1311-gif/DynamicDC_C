@@ -1,0 +1,174 @@
+﻿npx create - react - app--template typescript.
+npm install antd
+npm install--save react - i18next i18next
+
+npm i axios react - router - dom @types/react-router-dom dayjs
+npm i redux redux - thunk react - redux antd @types/react-redux @types/redux - thunk
+npm i react - select / async  @types/react-select/async
+
+npm install less - g
+lessc--js my - theme.less result.css
+
+npm i react - icons--save
+https://react-icons.github.io/react-icons/
+
+make favicon from letters
+https://favicon.io/favicon-generator/
+
+npm run build
+
+DataLoad Example
+
+SELECT '{"name": "' + replace([name], '"', '\"') + '","code": "' + [code] + '","module": "abbc880e-d9d4-47b9-9f08-05e3eb3a17a0", "type":
+"touristInfo_theme", "active": "1"}, '
+
+FROM[dbo].[___zzz_load]
+
+{
+  "utils" :
+  [
+    { "name": "הרץ", "code": "2", "module": "abbc880e-d9d4-47b9-9f08-05e3eb3a17a0", "type": "touristInfo_theme", "active": "1" },
+    { "name": "אלדן", "code": "2", "module": "abbc880e-d9d4-47b9-9f08-05e3eb3a17a0", "type": "touristInfo_theme", "active": "1" }
+  ]
+}
+
+
+
+
+
+select top 1 value from[dbo].[tprp] where sequence = '30' and ticket = (
+  select top 1 ticket from[dbo].[tprp] where category = '60db5a15-3233-4418-969b-5cc2ce6894af' and sequence = '60' and value = '111111'  order by create_dt desc)
+order by create_dt desc
+
+1712759481
+1712760514
+
+
+1712759481
+
+select value from[dbo].[tprp] where sequence = '30' and  tab_type = 'd0193265-e901-492c-84c1-fb2f57ef0306' and  ticket = (
+  select top 1 ticket from[dbo].[tprp] where
+category = '60db5a15-3233-4418-969b-5cc2ce6894af' and tab_type = 'd0193265-e901-492c-84c1-fb2f57ef0306' and sequence = '60' and value = '111111'
+order by create_dt desc)
+
+select   ticket, last_mod_dt from[dbo].[tprp] where category = '60db5a15-3233-4418-969b-5cc2ce6894af' and tab_type = 'd0193265-e901-492c-84c1-fb2f57ef0306'  and sequence = '60' and value = '111111'  order by last_mod_dt desc
+
+select dateadd(s, 1693140994, '01/01/1970')
+
+clean db
+delete [dbo].[tevents]
+delete [dbo].logs
+delete [dbo].tickets
+delete [dbo].tprp
+
+
+============================================ 65 Button ==============================
+[{
+"type":"getSetDataTypeDate",
+"sequenceFromValue":"60",
+"sequenceToValue":"70",
+"query": {
+"first":"value",
+"second":"[dbo].[tprp]",
+"third":"sequence = '30' and  tab_type ='@tab_type' and  ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and tab_type ='@tab_type' and sequence = '@sequenceFromValue' and value = '@valueFromValue'  and ticket <> '@CurrentTicket' order by create_dt desc)"
+}
+}
+,
+{
+"type":"getSetSumFromListDataByTicket",
+"sequenceFromValue":"60",
+"sequenceToValue":"120",
+"query": {
+"first":"sum(CAST(ehour AS INTEGER)) as value",
+"second":"[dbo].[tevents]",
+"third":" ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and tab_type ='@tab_type' and sequence = '60' and value = '@valueFromValue'  and ticket <> '@CurrentTicket' order by create_dt desc)"
+}
+}
+]
+=============================================== 95 button ====
+[
+{
+"type":"getSetMultiLastData",
+"sequenceFromValue":"60",
+"fromValueTab_type":"d0193265-e901-492c-84c1-fb2f57ef0306",
+"sequences":"80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270",
+"query": {
+"first":"*",
+"second":"[dbo].[tprp]",
+"third":"ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and sequence = '@sequenceFromValue' and value = '@valueFromValue' and ticket <> '@ticket' order by create_dt desc)"
+}},
+{
+"type":"getSetMultiLastDataToHidden",
+"sequenceFromValue":"60",
+"fromValueTab_type":"d0193265-e901-492c-84c1-fb2f57ef0306",
+"sequences": [{"from":"50,51,52,53,53,55","to":"45"},{"from":"0,61,62,63,64,65","to":"46"}],
+"query": {
+"first":"*",
+"second":"[dbo].[tprp]",
+"third":"ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and sequence = '@sequenceFromValue' and value = '@valueFromValue' and ticket <> '@ticket' order by create_dt desc)"
+}}
+]
+====================== 07072024 ===============================
+בדוק מודרך היסטוריה
+[{
+"type":"getSetDataTypeDate",
+"sequenceFromValue":"60",
+"sequenceToValue":"70",
+"query": {
+"first":"value",
+"second":"[dbo].[tprp]",
+"third":"sequence = '30' and  tab_type ='@tab_type' and  ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and tab_type ='@tab_type' and sequence = '@sequenceFromValue' and value = '@valueFromValue'  and ticket <> '@ticket' order by create_dt desc)"
+}
+}
+,
+{
+"type":"getSetSumFromListDataByTicket",
+"sequenceFromValue":"60",
+"sequenceToValue":"120",
+"query": {
+"first":"sum(CAST(ehour AS INTEGER)) as value",
+"second":"[dbo].[tevents]",
+"third":" ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and tab_type ='@tab_type' and sequence = '60' and value = '@valueFromValue'  and ticket <> '@ticket' order by create_dt desc)"
+}
+}
+]
+-----
+בדוק היסטורית
+[
+{
+"type":"getSetMultiLastData",
+"sequenceFromValue":"60",
+"fromValueTab_type":"d0193265-e901-492c-84c1-fb2f57ef0306",
+"sequences":"80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270",
+"query": {
+"first":"*",
+"second":"[dbo].[tprp]",
+"third":"ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and sequence = '@sequenceFromValue' and value = '@valueFromValue' and ticket <> '@ticket' order by create_dt desc)"
+}},
+{
+"type":"getSetMultiLastDataToHidden",
+"sequenceFromValue":"60",
+"fromValueTab_type":"d0193265-e901-492c-84c1-fb2f57ef0306",
+"sequences": [{"from":"50,51,52,53,53,55","to":"45"},{"from":"0,61,62,63,64,65","to":"46"}],
+"query": {
+"first":"*",
+"second":"[dbo].[tprp]",
+"third":"ticket = (__s__ top 1 ticket __f__ [dbo].[tprp] __w__ category = '@category' and sequence = '@sequenceFromValue' and value = '@valueFromValue' and ticket <> '@ticket' order by create_dt desc)"
+}}
+]
+
+שעת התחלת  השגחה מ
+{ "visibility":"hidden", "defaultFunctionName":"ThisDateHours" }
+שעת התחלת  השגחה  UTC
+{ "visibility":"hidden", "defaultFunctionName":"ThisDateUTCHours" }
+
+----------------- Clear Category after delete  select * FROM [dbo].[ticket_category] where name in ('1','2', '3','4')
+--delete [dbo].[ticket_category] where name in ('1','2', '3','4')
+
+select * from tprptpl where category not in (select id from ticket_category)
+
+--delete tprptpl where category not in (select id from ticket_category)
+
+select * from utils where type = 'prp_list_value' and parent not  in (select id from tprptpl)
+
+--delete utils where type = 'prp_list_value' and parent not  in (select id from tprptpl)
