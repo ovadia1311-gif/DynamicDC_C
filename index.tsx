@@ -32,21 +32,24 @@ export enum RouteNames {
   MASTERS_USERS_MANAGEMENT = '/management/master/users',
 }
 
-/**
- * Route שמאפשר כניסה רק למשתמש מחובר.
- *
- * getCurrentUser() ב-store שלך בודק קודם את currentUser ואם הוא לא קיים
- * משחזר אותו מ-localStorage, לכן הבדיקה מתבצעת סינכרונית לפני ה-Redirect.
- */
+type AllowedRole = 'user' | 'admin' | 'master';
+
+const normalizeRole = (role?: string | null): AllowedRole => {
+  const value = String(role ?? 'user').trim().toLowerCase();
+  if (value === 'master') return 'master';
+  if (value === 'admin') return 'admin';
+  return 'user';
+};
+
 const PrivateRoute: React.FC<{
   path: string;
   exact?: boolean;
   children?: React.ReactNode;
 }> = ({ children, ...rest }) => {
-  const state = useInspectionStore.getState();
-  const user = state.getCurrentUser
-    ? state.getCurrentUser()
-    : state.currentUser;
+  const currentUser = useInspectionStore((state) => state.currentUser);
+  const user =
+    currentUser ??
+    useInspectionStore.getState().getCurrentUser();
 
   return (
     <Route
@@ -67,20 +70,47 @@ const PrivateRoute: React.FC<{
   );
 };
 
-/**
- * יעד ברירת מחדל לכתובת לא מוכרת.
- *
- * בעבר כל URL לא מוכר נשלח ל-/login.
- * כתוצאה מכך ניווט לנתיב ישן כמו /management הציג לרגע את Login
- * ואז החזיר את המשתמש המחובר לדשבורד.
- *
- * עכשיו משתמש מחובר לעולם לא נשלח ל-Login בגלל URL לא מוכר.
- */
+const RoleRoute: React.FC<{
+  path: string;
+  exact?: boolean;
+  allowedRoles: AllowedRole[];
+  children?: React.ReactNode;
+}> = ({ children, allowedRoles, ...rest }) => {
+  const currentUser = useInspectionStore((state) => state.currentUser);
+  const user =
+    currentUser ??
+    useInspectionStore.getState().getCurrentUser();
+
+  return (
+    <Route
+      {...rest}
+      render={({ location }) => {
+        if (!user) {
+          return (
+            <Redirect
+              to={{
+                pathname: RouteNames.LOGIN,
+                state: { from: location },
+              }}
+            />
+          );
+        }
+
+        if (!allowedRoles.includes(normalizeRole(user.role))) {
+          return <Redirect to={RouteNames.MANAGEMENT_DASHBOARD} />;
+        }
+
+        return <>{children}</>;
+      }}
+    />
+  );
+};
+
 const FallbackRoute: React.FC = () => {
-  const state = useInspectionStore.getState();
-  const user = state.getCurrentUser
-    ? state.getCurrentUser()
-    : state.currentUser;
+  const currentUser = useInspectionStore((state) => state.currentUser);
+  const user =
+    currentUser ??
+    useInspectionStore.getState().getCurrentUser();
 
   return (
     <Redirect
@@ -98,17 +128,28 @@ export const AppRouter: React.FC = () => {
     <Switch>
       <Route exact path={RouteNames.LOGIN} component={Login} />
 
+      {/* כל משתמש מחובר יכול להגיע לדשבורד */}
       <PrivateRoute exact path={RouteNames.MANAGEMENT_DASHBOARD}>
         <ManagementDashboard />
       </PrivateRoute>
 
-      <PrivateRoute exact path={RouteNames.INSPECTORS}>
+      {/* ניהול בודקים - אדמין או מאסטר */}
+      <RoleRoute
+        exact
+        path={RouteNames.INSPECTORS}
+        allowedRoles={['admin', 'master']}
+      >
         <InspectorManagement />
-      </PrivateRoute>
+      </RoleRoute>
 
-      <PrivateRoute exact path={RouteNames.MASTERS_USERS_MANAGEMENT}>
+      {/* ניהול משתמשים - מאסטר בלבד */}
+      <RoleRoute
+        exact
+        path={RouteNames.MASTERS_USERS_MANAGEMENT}
+        allowedRoles={['master']}
+      >
         <MasterUserManagement />
-      </PrivateRoute>
+      </RoleRoute>
 
       <PrivateRoute exact path={RouteNames.NEW_FORM}>
         <InspectionForm />
@@ -134,19 +175,25 @@ export const AppRouter: React.FC = () => {
         <FormDevices />
       </PrivateRoute>
 
-      <PrivateRoute exact path={RouteNames.UNIT_AREA_MANAGEMENT}>
+      {/* ניהול יחידות/אזורים - מאסטר בלבד */}
+      <RoleRoute
+        exact
+        path={RouteNames.UNIT_AREA_MANAGEMENT}
+        allowedRoles={['master']}
+      >
         <UnitAreaManagement />
-      </PrivateRoute>
+      </RoleRoute>
 
-      <PrivateRoute exact path={RouteNames.DEEVICE_MENEGEMENT}>
+      {/* ניהול מכשירים - אדמין או מאסטר */}
+      <RoleRoute
+        exact
+        path={RouteNames.DEEVICE_MENEGEMENT}
+        allowedRoles={['admin', 'master']}
+      >
         <DeviceManagement />
-      </PrivateRoute>
+      </RoleRoute>
 
-      {/*
-        תמיכה זמנית בנתיבים הישנים.
-        כך שגם אם נשאר somewhere בקוד navigate.push לנתיב הישן,
-        לא עוברים דרך מסך Login.
-      */}
+      {/* תאימות לנתיבים ישנים */}
       <Redirect
         exact
         from="/management"
@@ -163,14 +210,13 @@ export const AppRouter: React.FC = () => {
         to={RouteNames.NEW_FORM}
       />
 
-      {/* דף הבית -> לדשבורד */}
       <Redirect
         exact
         from={RouteNames.HOME}
         to={RouteNames.MANAGEMENT_DASHBOARD}
       />
 
-      {/* כתובת לא מוכרת: מחובר -> Dashboard, לא מחובר -> Login */}
+      {/* לא שולחים משתמש מחובר ל-Login בגלל URL לא מוכר */}
       <Route component={FallbackRoute} />
     </Switch>
   );
