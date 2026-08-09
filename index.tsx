@@ -1,6 +1,9 @@
-// src/router/index.tsx
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import {
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom';
 
 import Login from '../pages/Login';
 import InspectionForm from '../components2/InspectionForm';
@@ -20,36 +23,81 @@ export enum RouteNames {
   HOME = '/',
   LOGIN = '/login',
   NEW_FORM = '/new-form',
-  INSPECTORS = '/management-dashboard/inspectors',
-  DEEVICE_MENEGEMENT = '/device-management',
+
+  INSPECTORS =
+    '/management-dashboard/inspectors',
+
+  DEEVICE_MENEGEMENT =
+    '/device-management',
+
   SCAN = '/inspection/scan',
-  INSPECTED_DEVICE_LIST = '/inspection/inspected',
-  UNINSPECTED_DEVICE_LIST = '/inspection/uninspected',
-  DEVICE_DETAILS = '/inspection/device/:deviceId',
-  MANAGEMENT_DASHBOARD = '/management-dashboard',
-  FORM_DEVICES = '/management/form/:formId',
-  UNIT_AREA_MANAGEMENT = '/management/units-areas',
-  MASTERS_USERS_MANAGEMENT = '/management/master/users',
+
+  INSPECTED_DEVICE_LIST =
+    '/inspection/inspected',
+
+  UNINSPECTED_DEVICE_LIST =
+    '/inspection/uninspected',
+
+  DEVICE_DETAILS =
+    '/inspection/device/:deviceId',
+
+  MANAGEMENT_DASHBOARD =
+    '/management-dashboard',
+
+  FORM_DEVICES =
+    '/management/form/:formId',
+
+  UNIT_AREA_MANAGEMENT =
+    '/management/units-areas',
+
+  MASTERS_USERS_MANAGEMENT =
+    '/management/master/users',
 }
 
-type AllowedRole = 'user' | 'admin' | 'master';
+type AllowedRole =
+  | 'user'
+  | 'admin'
+  | 'master';
 
-const normalizeRole = (role?: string | null): AllowedRole => {
-  const value = String(role ?? 'user').trim().toLowerCase();
-  if (value === 'master') return 'master';
-  if (value === 'admin') return 'admin';
+function normalizeRole(
+  value: any
+): AllowedRole {
+  const role = String(
+    value ?? 'user'
+  )
+    .trim()
+    .toLowerCase();
+
+  if (role === 'master') {
+    return 'master';
+  }
+
+  if (role === 'admin') {
+    return 'admin';
+  }
+
   return 'user';
-};
+}
 
 const PrivateRoute: React.FC<{
   path: string;
   exact?: boolean;
   children?: React.ReactNode;
-}> = ({ children, ...rest }) => {
-  const currentUser = useInspectionStore((state) => state.currentUser);
+}> = ({
+  children,
+  ...rest
+}) => {
+  const currentUser =
+    useInspectionStore(
+      (state) =>
+        state.currentUser
+    );
+
   const user =
     currentUser ??
-    useInspectionStore.getState().getCurrentUser();
+    useInspectionStore
+      .getState()
+      .getCurrentUser();
 
   return (
     <Route
@@ -60,8 +108,11 @@ const PrivateRoute: React.FC<{
         ) : (
           <Redirect
             to={{
-              pathname: RouteNames.LOGIN,
-              state: { from: location },
+              pathname:
+                RouteNames.LOGIN,
+              state: {
+                from: location,
+              },
             }}
           />
         )
@@ -75,11 +126,22 @@ const RoleRoute: React.FC<{
   exact?: boolean;
   allowedRoles: AllowedRole[];
   children?: React.ReactNode;
-}> = ({ children, allowedRoles, ...rest }) => {
-  const currentUser = useInspectionStore((state) => state.currentUser);
+}> = ({
+  children,
+  allowedRoles,
+  ...rest
+}) => {
+  const currentUser =
+    useInspectionStore(
+      (state) =>
+        state.currentUser
+    );
+
   const user =
     currentUser ??
-    useInspectionStore.getState().getCurrentUser();
+    useInspectionStore
+      .getState()
+      .getCurrentUser();
 
   return (
     <Route
@@ -89,15 +151,33 @@ const RoleRoute: React.FC<{
           return (
             <Redirect
               to={{
-                pathname: RouteNames.LOGIN,
-                state: { from: location },
+                pathname:
+                  RouteNames.LOGIN,
+                state: {
+                  from: location,
+                },
               }}
             />
           );
         }
 
-        if (!allowedRoles.includes(normalizeRole(user.role))) {
-          return <Redirect to={RouteNames.MANAGEMENT_DASHBOARD} />;
+        const role =
+          normalizeRole(
+            user.role
+          );
+
+        if (
+          !allowedRoles.includes(
+            role
+          )
+        ) {
+          return (
+            <Redirect
+              to={
+                RouteNames.MANAGEMENT_DASHBOARD
+              }
+            />
+          );
         }
 
         return <>{children}</>;
@@ -106,118 +186,218 @@ const RoleRoute: React.FC<{
   );
 };
 
-const FallbackRoute: React.FC = () => {
-  const currentUser = useInspectionStore((state) => state.currentUser);
-  const user =
-    currentUser ??
-    useInspectionStore.getState().getCurrentUser();
+const FallbackRoute: React.FC =
+  () => {
+    const currentUser =
+      useInspectionStore(
+        (state) =>
+          state.currentUser
+      );
 
-  return (
-    <Redirect
-      to={
-        user
-          ? RouteNames.MANAGEMENT_DASHBOARD
-          : RouteNames.LOGIN
-      }
-    />
-  );
-};
+    const user =
+      currentUser ??
+      useInspectionStore
+        .getState()
+        .getCurrentUser();
 
-export const AppRouter: React.FC = () => {
-  return (
-    <Switch>
-      <Route exact path={RouteNames.LOGIN} component={Login} />
-
-      {/* כל משתמש מחובר יכול להגיע לדשבורד */}
-      <PrivateRoute exact path={RouteNames.MANAGEMENT_DASHBOARD}>
-        <ManagementDashboard />
-      </PrivateRoute>
-
-      {/* ניהול בודקים - אדמין או מאסטר */}
-      <RoleRoute
-        exact
-        path={RouteNames.INSPECTORS}
-        allowedRoles={['admin', 'master']}
-      >
-        <InspectorManagement />
-      </RoleRoute>
-
-      {/* ניהול משתמשים - מאסטר בלבד */}
-      <RoleRoute
-        exact
-        path={RouteNames.MASTERS_USERS_MANAGEMENT}
-        allowedRoles={['master']}
-      >
-        <MasterUserManagement />
-      </RoleRoute>
-
-      <PrivateRoute exact path={RouteNames.NEW_FORM}>
-        <InspectionForm />
-      </PrivateRoute>
-
-      <PrivateRoute exact path={RouteNames.SCAN}>
-        <DeviceScanner />
-      </PrivateRoute>
-
-      <PrivateRoute exact path={RouteNames.INSPECTED_DEVICE_LIST}>
-        <DeviceList />
-      </PrivateRoute>
-
-      <PrivateRoute exact path={RouteNames.UNINSPECTED_DEVICE_LIST}>
-        <DeviceList />
-      </PrivateRoute>
-
-      <PrivateRoute exact path={RouteNames.DEVICE_DETAILS}>
-        <DeviceDetails />
-      </PrivateRoute>
-
-      <PrivateRoute exact path={RouteNames.FORM_DEVICES}>
-        <FormDevices />
-      </PrivateRoute>
-
-      {/* ניהול יחידות/אזורים - מאסטר בלבד */}
-      <RoleRoute
-        exact
-        path={RouteNames.UNIT_AREA_MANAGEMENT}
-        allowedRoles={['master']}
-      >
-        <UnitAreaManagement />
-      </RoleRoute>
-
-      {/* ניהול מכשירים - אדמין או מאסטר */}
-      <RoleRoute
-        exact
-        path={RouteNames.DEEVICE_MENEGEMENT}
-        allowedRoles={['admin', 'master']}
-      >
-        <DeviceManagement />
-      </RoleRoute>
-
-      {/* תאימות לנתיבים ישנים */}
+    return (
       <Redirect
-        exact
-        from="/management"
-        to={RouteNames.MANAGEMENT_DASHBOARD}
+        to={
+          user
+            ? RouteNames.MANAGEMENT_DASHBOARD
+            : RouteNames.LOGIN
+        }
       />
-      <Redirect
-        exact
-        from="/management/inspectors"
-        to={RouteNames.INSPECTORS}
-      />
-      <Redirect
-        exact
-        from="/management/new-form"
-        to={RouteNames.NEW_FORM}
-      />
+    );
+  };
 
-      <Redirect
-        exact
-        from={RouteNames.HOME}
-        to={RouteNames.MANAGEMENT_DASHBOARD}
-      />
+export const AppRouter: React.FC =
+  () => {
+    return (
+      <Switch>
+        <Route
+          exact
+          path={RouteNames.LOGIN}
+          component={Login}
+        />
 
-      {/* לא שולחים משתמש מחובר ל-Login בגלל URL לא מוכר */}
-      <Route component={FallbackRoute} />
-    </Switch>
-  );
-};
+        <PrivateRoute
+          exact
+          path={
+            RouteNames.MANAGEMENT_DASHBOARD
+          }
+        >
+          <ManagementDashboard />
+        </PrivateRoute>
+
+        {/*
+          בודקים:
+          אדמין מנהל את הבודקים ביחידה שלו.
+          מאסטר מנהל לפי היחידה שנבחרה.
+        */}
+        <RoleRoute
+          exact
+          path={
+            RouteNames.INSPECTORS
+          }
+          allowedRoles={[
+            'admin',
+            'master',
+          ]}
+        >
+          <InspectorManagement />
+        </RoleRoute>
+
+        {/*
+          ניהול משתמשים מערכתיים:
+          MASTER בלבד.
+        */}
+        <RoleRoute
+          exact
+          path={
+            RouteNames.MASTERS_USERS_MANAGEMENT
+          }
+          allowedRoles={[
+            'master',
+          ]}
+        >
+          <MasterUserManagement />
+        </RoleRoute>
+
+        <PrivateRoute
+          exact
+          path={
+            RouteNames.NEW_FORM
+          }
+        >
+          <InspectionForm />
+        </PrivateRoute>
+
+        <PrivateRoute
+          exact
+          path={RouteNames.SCAN}
+        >
+          <DeviceScanner />
+        </PrivateRoute>
+
+        <PrivateRoute
+          exact
+          path={
+            RouteNames.INSPECTED_DEVICE_LIST
+          }
+        >
+          <DeviceList />
+        </PrivateRoute>
+
+        <PrivateRoute
+          exact
+          path={
+            RouteNames.UNINSPECTED_DEVICE_LIST
+          }
+        >
+          <DeviceList />
+        </PrivateRoute>
+
+        <PrivateRoute
+          exact
+          path={
+            RouteNames.DEVICE_DETAILS
+          }
+        >
+          <DeviceDetails />
+        </PrivateRoute>
+
+        <PrivateRoute
+          exact
+          path={
+            RouteNames.FORM_DEVICES
+          }
+        >
+          <FormDevices />
+        </PrivateRoute>
+
+        {/*
+          יצירת/עריכת יחידות ואזורים:
+          MASTER בלבד.
+        */}
+        <RoleRoute
+          exact
+          path={
+            RouteNames.UNIT_AREA_MANAGEMENT
+          }
+          allowedRoles={[
+            'master',
+          ]}
+        >
+          <UnitAreaManagement />
+        </RoleRoute>
+
+        {/*
+          ניהול מכשירים:
+          ADMIN ביחידה שלו,
+          MASTER ביחידה הפעילה.
+        */}
+        <RoleRoute
+          exact
+          path={
+            RouteNames.DEEVICE_MENEGEMENT
+          }
+          allowedRoles={[
+            'admin',
+            'master',
+          ]}
+        >
+          <DeviceManagement />
+        </RoleRoute>
+
+        {/*
+          תאימות לקוד הישן:
+          אין צורך לשנות כרגע את כל navigate.push
+          בקומפוננטות.
+        */}
+        <Redirect
+          exact
+          from="/management"
+          to={
+            RouteNames.MANAGEMENT_DASHBOARD
+          }
+        />
+
+        <Redirect
+          exact
+          from="/management/inspectors"
+          to={
+            RouteNames.INSPECTORS
+          }
+        />
+
+        <Redirect
+          exact
+          from="/management/new-form"
+          to={
+            RouteNames.NEW_FORM
+          }
+        />
+
+        <Redirect
+          exact
+          from={RouteNames.HOME}
+          to={
+            RouteNames.MANAGEMENT_DASHBOARD
+          }
+        />
+
+        {/*
+          כתובת לא מוכרת:
+          משתמש מחובר -> Dashboard
+          משתמש לא מחובר -> Login
+
+          כך לא יהיה יותר flash של Login
+          בגלל נתיב שגוי.
+        */}
+        <Route
+          component={FallbackRoute}
+        />
+      </Switch>
+    );
+  };
